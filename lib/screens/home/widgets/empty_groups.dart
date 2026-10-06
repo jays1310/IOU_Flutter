@@ -12,32 +12,35 @@ class EmptyGroups extends StatelessWidget {
     final s = AppScaler(context);
 
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'No Groups Yet',
-            style: AppTextStyles.welcomeText(
-              s.sp(24),
-            ),
-          ),
-
-          SizedBox(height: s.h(10)),
-
-          SizedBox(
-            width: s.w(250),
-            child: Text(
-              'Tap the + button below to create a new group or join an existing one.',
-              textAlign: TextAlign.center,
-              style: AppTextStyles.buttonText(
-                s.sp(14),
-              ).copyWith(
-                color: AppColors.grey,
-                height: 1.4,
+      child: Transform.translate(
+        offset: Offset(0, -s.h(50)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Nothing Here Yet',
+              style: AppTextStyles.welcomeText(
+                s.sp(24),
               ),
             ),
-          ),
-        ],
+
+            SizedBox(height: s.h(10)),
+
+            SizedBox(
+              width: s.w(250),
+              child: Text(
+                'Start splitting expenses with friends or groups. Tap the + button to get started.',
+                textAlign: TextAlign.center,
+                style: AppTextStyles.buttonText(
+                  s.sp(14),
+                ).copyWith(
+                  color: AppColors.grey,
+                  height: 1.4,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

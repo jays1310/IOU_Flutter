@@ -4,7 +4,12 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/app_scaler.dart';
 
 class HomeSearchBar extends StatelessWidget {
-  const HomeSearchBar({super.key});
+  final ValueChanged<String>? onChanged;
+
+  const HomeSearchBar({
+    super.key,
+    this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -12,50 +17,78 @@ class HomeSearchBar extends StatelessWidget {
 
     return Container(
       height: scaler.h(48),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF2EBF7),
-        borderRadius: BorderRadius.circular(scaler.h(30)),
-      ),
       padding: EdgeInsets.symmetric(
         horizontal: scaler.w(14),
       ),
+      decoration: BoxDecoration(
+        // ============================================================
+        // GLASS BACKGROUND
+        // ============================================================
+
+        color: Colors.white.withValues(
+          alpha: 0.055,
+        ),
+
+        borderRadius: BorderRadius.circular(
+          scaler.h(30),
+        ),
+
+        // ============================================================
+        // PURPLE GLASS BORDER
+        // ============================================================
+
+        border: Border.all(
+          color: AppColors.primary.withValues(
+            alpha: 0.22,
+          ),
+          width: 1,
+        ),
+      ),
       child: Row(
         children: [
+          // ==========================================================
+          // SEARCH ICON
+          // ==========================================================
+
           Icon(
-            Icons.menu_rounded,
-            color: Colors.black54,
-            size: scaler.sp(18),
+            Icons.search_rounded,
+            color: AppColors.accent,
+            size: scaler.sp(22),
           ),
 
-          SizedBox(width: scaler.w(10)),
+          SizedBox(
+            width: scaler.w(8),
+          ),
+
+          // ==========================================================
+          // SEARCH FIELD
+          // ==========================================================
 
           Expanded(
             child: TextField(
               cursorColor: AppColors.accent,
+              onChanged: onChanged,
               style: TextStyle(
-                color: Colors.black87,
-                fontSize: scaler.sp(13),
+                color: Colors.white,
+                fontFamily: 'Raleway',
+                fontSize: scaler.sp(14),
               ),
               decoration: InputDecoration(
-                isDense: true,
+                hintText: 'Search groups or people...',
+                hintStyle: TextStyle(
+                  color: Colors.white.withValues(
+                    alpha: 0.45,
+                  ),
+                  fontFamily: 'Raleway',
+                  fontSize: scaler.sp(14),
+                ),
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
+                isCollapsed: true,
                 contentPadding: EdgeInsets.zero,
-                hintText: 'search contact or group',
-                hintStyle: TextStyle(
-                  color: Colors.black54,
-                  fontSize: scaler.sp(13),
-                ),
-                filled: false,
               ),
             ),
-          ),
-
-          Icon(
-            Icons.search_rounded,
-            color: Colors.black54,
-            size: scaler.sp(18),
           ),
         ],
       ),

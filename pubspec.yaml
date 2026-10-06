@@ -54,6 +54,9 @@ dependencies:
   # Secure Storage
   flutter_secure_storage: ^10.3.1
 
+  # Flutter Contacts
+  flutter_contacts: ^1.1.9+2
+
   # UUID Generator
   uuid: ^4.5.1
 
@@ -64,6 +67,7 @@ dependencies:
   firebase_core: ^4.12.1
   firebase_auth: ^6.5.6
   pinput: ^6.0.2
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -89,6 +93,11 @@ flutter:
     - assets/icons/
     - assets/logos/
 
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/images/app_icon.png"
+  min_sdk_android: 21
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

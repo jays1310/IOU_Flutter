@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 
-import '../theme/app_colors.dart';
 
 class AppToast {
   static void success(BuildContext context, String message) {

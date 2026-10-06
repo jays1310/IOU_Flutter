@@ -1,9 +1,10 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/app_scaler.dart';
 import 'fab_menu_item.dart';
-import 'dart:ui';
 
 class HomeFAB extends StatefulWidget {
   const HomeFAB({
@@ -38,6 +39,10 @@ class _HomeFABState extends State<HomeFAB> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
+        // ===========================================================
+        // EXPANDED MENU
+        // ===========================================================
+
         AnimatedSlide(
           offset: _isOpen
               ? Offset.zero
@@ -62,28 +67,31 @@ class _HomeFABState extends State<HomeFAB> {
                       vertical: s.h(8),
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.05),
+                      color: Colors.white.withValues(
+                        alpha: 0.05,
+                      ),
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(
-                        color: AppColors.accent.withValues(alpha: 0.25),
+                        color: AppColors.accent.withValues(
+                          alpha: 0.25,
+                        ),
                         width: 1,
                       ),
                     ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment:
+                      CrossAxisAlignment.start,
                       children: [
                         FabMenuItem(
                           icon: Icons.person_add_alt_1_rounded,
-                          label: 'Add Contact',
+                          label: 'Add Individual',
                           onTap: widget.onAddContact,
                         ),
-
                         FabMenuItem(
                           icon: Icons.group_add_rounded,
                           label: 'Join Group',
                           onTap: widget.onJoinGroup,
                         ),
-
                         FabMenuItem(
                           icon: Icons.groups_rounded,
                           label: 'Create Group',
@@ -98,26 +106,86 @@ class _HomeFABState extends State<HomeFAB> {
           ),
         ),
 
+        // Space between menu and FAB
+        SizedBox(
+          height: s.h(10),
+        ),
+
+        // ===========================================================
+        // GLASS FAB
+        // ===========================================================
+
         GestureDetector(
           onTap: _toggle,
           child: Container(
-            width: s.w(54),
-            height: s.w(54),
+            width: s.w(58),
+            height: s.w(58),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(
-                color: AppColors.accent,
-                width: 3,
-              ),
+
+              // Soft glow behind the glass
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(
+                    alpha: 0.35,
+                  ),
+                  blurRadius: 18,
+                  spreadRadius: 2,
+                ),
+              ],
             ),
-            child: AnimatedRotation(
-              turns: _isOpen ? 0.125 : 0,
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeInOut,
-              child: Icon(
-                _isOpen ? Icons.close : Icons.add,
-                color: AppColors.accent,
-                size: s.sp(32),
+            child: ClipOval(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: 10,
+                  sigmaY: 10,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+
+                    // Glassy gradient
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.primary.withValues(
+                          alpha: 0.32,
+                        ),
+                        AppColors.accent.withValues(
+                          alpha: 0.18,
+                        ),
+                        Colors.white.withValues(
+                          alpha: 0.07,
+                        ),
+                      ],
+                    ),
+
+                    // Glass border
+                    border: Border.all(
+                      color: AppColors.accent.withValues(
+                        alpha: 0.85,
+                      ),
+                      width: 2,
+                    ),
+                  ),
+                  child: Center(
+                    child: AnimatedRotation(
+                      turns: _isOpen ? 0.125 : 0,
+                      duration: const Duration(
+                        milliseconds: 250,
+                      ),
+                      curve: Curves.easeInOut,
+                      child: Icon(
+                        _isOpen
+                            ? Icons.close
+                            : Icons.add,
+                        color: Colors.white,
+                        size: s.sp(32),
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),

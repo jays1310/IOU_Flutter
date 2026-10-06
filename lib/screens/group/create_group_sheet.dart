@@ -1,140 +1,159 @@
 import 'package:flutter/material.dart';
-
-import '../../core/theme/app_colors.dart';
-import '../../core/utils/app_scaler.dart';
-import '../../widgets/app_button.dart';
-import '../../widgets/app_text_field.dart';
+import 'package:go_router/go_router.dart';
 import 'package:iou_flutter/core/theme/app_text_styles.dart';
 import 'package:provider/provider.dart';
+
+import '../../core/theme/app_colors.dart';
 import '../../providers/group_provider.dart';
+import '../../widgets/app_button.dart';
+import '../../widgets/app_text_field.dart';
+import 'select_members_screen.dart';
 
 class CreateGroupSheet extends StatefulWidget {
-  const CreateGroupSheet({super.key});
+  const CreateGroupSheet({
+    super.key,
+  });
 
   @override
   State<CreateGroupSheet> createState() => _CreateGroupSheetState();
 }
 
 class _CreateGroupSheetState extends State<CreateGroupSheet> {
-  final TextEditingController _groupNameController =
+  final TextEditingController groupNameController =
   TextEditingController();
 
   @override
   void dispose() {
-    _groupNameController.dispose();
+    groupNameController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final s = AppScaler(context);
+    final groupProvider = context.watch<GroupProvider>();
 
-    return Padding(
+    final keyboardHeight =
+        MediaQuery.viewInsetsOf(context).bottom;
+
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
       padding: EdgeInsets.only(
-        left: s.w(20),
-        right: s.w(20),
-        top: s.h(20),
-        bottom: MediaQuery.of(context).viewInsets.bottom + s.h(20),
+        bottom: keyboardHeight,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: s.w(50),
-              height: s.h(5),
-              decoration: BoxDecoration(
-                color: AppColors.accent,
-                borderRadius: BorderRadius.circular(20),
-              ),
+      child: SafeArea(
+        top: false,
+        child: Container(
+          decoration: const BoxDecoration(
+            color: AppColors.card,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(24),
             ),
           ),
+          child: SingleChildScrollView(
+            keyboardDismissBehavior:
+            ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: const EdgeInsets.fromLTRB(
+              24,
+              16,
+              24,
+              24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // =====================================================
+                // DRAG HANDLE
+                // =====================================================
 
-          SizedBox(height: s.h(24)),
-
-          Text(
-            'Create Group',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-
-          SizedBox(height: s.h(20)),
-
-          AppTextField(
-            controller: _groupNameController,
-            hintText: 'Group Name',
-          ),
-
-          SizedBox(height: s.h(30)),
-
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(
-                    'Cancel',
-                    style: AppTextStyles.buttonText(18).copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.accent,
+                Center(
+                  child: Container(
+                    width: 45,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius:
+                      BorderRadius.circular(10),
                     ),
                   ),
                 ),
-              ),
 
-              SizedBox(width: s.w(12)),
+                const SizedBox(height: 24),
 
-              Expanded(
-                child: SizedBox(
-                  height: s.h(38),
-                  child:AppButton(
-                    text: 'Create',
-                    width: double.infinity,
-                    height: s.h(38),
-                    borderRadius: BorderRadius.circular(30),
-                    showShadow: false,
-                    onPressed: () async {
-                      final groupName = _groupNameController.text.trim();
+                // =====================================================
+                // TITLE
+                // =====================================================
 
-                      if (groupName.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Please enter a group name'),
-                          ),
-                        );
-                        return;
-                      }
+                Text(
+                  'Create Group',
+                  style: AppTextStyles.welcomeText(28),
+                ),
 
-                      try {
-                        await context.read<GroupProvider>().createGroup(
-                          groupName: groupName,
-                        );
+                const SizedBox(height: 8),
 
-                        if (!mounted) return;
-
-                        Navigator.pop(context);
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Group created successfully'),
-                          ),
-                        );
-                      } catch (e) {
-                        if (!mounted) return;
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(e.toString()),
-                          ),
-                        );
-                      }
-                    },
+                Text(
+                  'Enter a name for your group',
+                  style: AppTextStyles.buttonText(15).copyWith(
+                    color: Colors.white70,
                   ),
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 24),
+
+                // =====================================================
+                // GROUP NAME
+                // =====================================================
+
+                AppTextField(
+                  controller: groupNameController,
+                  hintText: 'Group Name',
+                ),
+
+                const SizedBox(height: 24),
+
+                // =====================================================
+                // CONTINUE
+                // =====================================================
+
+                AppButton(
+                  width: double.infinity,
+                  height: 50,
+                  text: 'Continue',
+                  isLoading: groupProvider.isLoading,
+                  onPressed: () {
+                    final groupName =
+                    groupNameController.text.trim();
+
+                    if (groupName.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Please enter a group name',
+                          ),
+                        ),
+                      );
+                      return;
+                    }
+
+                    if (!mounted) return;
+
+                    Navigator.pop(context);
+
+                    context.push(
+                      '/select-members',
+                      extra: SelectMembersScreen(
+                        groupName: groupName,
+                      ),
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 8),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }

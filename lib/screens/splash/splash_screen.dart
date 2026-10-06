@@ -28,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Center(
         child: Image.asset(
           AppAssets.iouLogo,
-          width: 220,
+          width: 250,
         ),
       ),
     );
