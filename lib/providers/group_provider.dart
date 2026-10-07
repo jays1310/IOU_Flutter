@@ -45,7 +45,7 @@ class GroupProvider extends ChangeNotifier {
   // CREATE GROUP
   // ================================================================
 
-  Future<void> createGroup({
+  Future<GroupModel> createGroup({
     required String groupName,
     required List<String> memberPhoneNumbers,
   }) async {
@@ -67,6 +67,8 @@ class GroupProvider extends ChangeNotifier {
       );
 
       _groups.add(newGroup);
+
+      return newGroup;
     } catch (e) {
       rethrow;
     } finally {

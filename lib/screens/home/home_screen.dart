@@ -20,7 +20,9 @@ import 'widgets/home_fab.dart';
 import 'widgets/home_group_list.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -33,13 +35,17 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _refreshHomeData();
+    WidgetsBinding.instance.addPostFrameCallback(
+          (_) async {
+        await _refreshHomeData();
 
-      final token = await TokenService().getToken();
+        final token = await TokenService().getToken();
 
-      debugPrint("JWT TOKEN: $token");
-    });
+        debugPrint(
+          'JWT TOKEN: $token',
+        );
+      },
+    );
   }
 
   // =========================================================
@@ -47,7 +53,9 @@ class _HomeScreenState extends State<HomeScreen> {
   // =========================================================
 
   Future<void> _refreshHomeData() async {
-    final groupProvider = context.read<GroupProvider>();
+    final groupProvider =
+    context.read<GroupProvider>();
+
     final transactionProvider =
     context.read<TransactionProvider>();
 
@@ -126,11 +134,13 @@ class _HomeScreenState extends State<HomeScreen> {
         onAddContact: () async {
           // Capture Navigator before the async gap so that
           // BuildContext is not accessed after awaiting.
+
           final navigator = Navigator.of(context);
 
           final selectedUser = await navigator.push(
             MaterialPageRoute(
-              builder: (_) => const SelectIndividualScreen(),
+              builder: (_) =>
+              const SelectIndividualScreen(),
             ),
           );
 
@@ -238,48 +248,69 @@ class _HomeScreenState extends State<HomeScreen> {
               // HOME CONTENT
               // =================================================
 
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: s.w(8),
-                ),
-                child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
-                  children: [
-                    // ===========================================
-                    // HOME HEADER
-                    // ===========================================
+              Column(
+                crossAxisAlignment:
+                CrossAxisAlignment.start,
+                children: [
+                  // =============================================
+                  // HOME HEADER
+                  // =============================================
 
-                    const HomeHeader(),
+                  const HomeHeader(),
 
-                    SizedBox(
-                      height: s.h(10),
-                    ),
+                  // =============================================
+                  // SEARCH + LIST AREA
+                  // =============================================
 
-                    // ===========================================
-                    // SEARCH BAR
-                    // ===========================================
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: s.w(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment:
+                        CrossAxisAlignment.start,
+                        children: [
+                          // =====================================
+                          // SPACE BELOW HEADER
+                          // =====================================
 
-                    HomeSearchBar(
-                      onChanged: _onSearchChanged,
-                    ),
+                          SizedBox(
+                            height: s.h(10),
+                          ),
 
-                    SizedBox(
-                      height: s.h(16),
-                    ),
+                          // =====================================
+                          // SEARCH BAR
+                          // =====================================
 
-                    // ===========================================
-                    // GROUP / INDIVIDUAL LIST
-                    // ===========================================
+                          HomeSearchBar(
+                            onChanged: _onSearchChanged,
+                          ),
 
-                    Expanded(
-                      child: HomeGroupList(
-                        searchQuery: _searchQuery,
-                        onRefresh: _refreshHomeData,
+                          // =====================================
+                          // SPACE BELOW SEARCH
+                          // =====================================
+
+                          SizedBox(
+                            height: s.h(16),
+                          ),
+
+                          // =====================================
+                          // GROUP / INDIVIDUAL LIST
+                          // =====================================
+
+                          Expanded(
+                            child: HomeGroupList(
+                              searchQuery: _searchQuery,
+                              onRefresh:
+                              _refreshHomeData,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),

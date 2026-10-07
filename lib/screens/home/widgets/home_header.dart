@@ -8,13 +8,16 @@ import '../../../widgets/app_icon.dart';
 import '../../profile/profile_screen.dart';
 
 class HomeHeader extends StatelessWidget {
-  const HomeHeader({super.key});
+  const HomeHeader({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     final scaler = AppScaler(context);
 
     return Container(
+      width: double.infinity,
       color: AppColors.background,
       padding: EdgeInsets.symmetric(
         horizontal: scaler.w(20),
@@ -23,6 +26,10 @@ class HomeHeader extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // =========================================================
+          // IOU LOGO
+          // =========================================================
+
           Image.asset(
             AppAssets.logoNoBackground,
             width: scaler.w(58),
@@ -34,14 +41,22 @@ class HomeHeader extends StatelessWidget {
             width: scaler.w(6),
           ),
 
+          // =========================================================
+          // APP NAME
+          // =========================================================
+
           Text(
-            "I Owe You",
+            'I Owe You',
             style: AppTextStyles.buttonText(
               scaler.sp(18),
             ),
           ),
 
           const Spacer(),
+
+          // =========================================================
+          // PROFILE BUTTON
+          // =========================================================
 
           GestureDetector(
             onTap: () {

@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+
 import '../models/registered_user_model.dart';
 import '../repositories/contacts_repository.dart';
 
 class ContactsProvider extends ChangeNotifier {
-  final ContactsRepository _repository = ContactsRepository();
+  final ContactsRepository _repository =
+  ContactsRepository();
 
   bool _isLoading = false;
   bool _hasPermission = false;
 
   List<Contact> _contacts = [];
   List<RegisteredUserModel> _registeredUsers = [];
+
   final Set<String> _selectedContacts = {};
+
   String _searchQuery = "";
+
+  // Normalized phone number of the currently
+  // logged-in user.
+  String? _currentUserPhoneNumber;
 
   bool get isLoading => _isLoading;
   bool get hasPermission => _hasPermission;
@@ -25,77 +33,179 @@ class ContactsProvider extends ChangeNotifier {
     return _contacts.where((contact) {
       return contact.displayName
           .toLowerCase()
-          .contains(_searchQuery.toLowerCase());
+          .contains(
+        _searchQuery.toLowerCase(),
+      );
     }).toList();
   }
 
-  List<RegisteredUserModel> get registeredUsers => _registeredUsers;
+  List<RegisteredUserModel> get registeredUsers =>
+      _registeredUsers;
 
-  Set<String> get selectedContacts => _selectedContacts;
+  Set<String> get selectedContacts =>
+      _selectedContacts;
 
-  bool get canCreateGroup => _selectedContacts.length >= 2;
+  bool get canCreateGroup =>
+      _selectedContacts.length >= 2;
 
-  Future<void> loadContacts() async {
+  // ================================================================
+  // PHONE NUMBER NORMALIZATION
+  // ================================================================
+
+  String normalizePhoneNumber(
+      String phoneNumber,
+      ) {
+    final digits = phoneNumber.replaceAll(
+      RegExp(r'\D'),
+      '',
+    );
+
+    if (digits.length > 10) {
+      return digits.substring(
+        digits.length - 10,
+      );
+    }
+
+    return digits;
+  }
+
+  // ================================================================
+  // LOAD CONTACTS
+  // ================================================================
+
+  Future<void> loadContacts({
+    String? currentUserPhoneNumber,
+  }) async {
     try {
-      debugPrint("loadContacts() called");
+      debugPrint(
+        "loadContacts() called",
+      );
 
       _isLoading = true;
       notifyListeners();
 
-      _hasPermission = await _repository.requestPermission();
+      // Store the logged-in user's normalized
+      // phone number.
+      if (currentUserPhoneNumber != null &&
+          currentUserPhoneNumber
+              .trim()
+              .isNotEmpty) {
+        _currentUserPhoneNumber =
+            normalizePhoneNumber(
+              currentUserPhoneNumber,
+            );
+      } else {
+        _currentUserPhoneNumber = null;
+      }
 
-      debugPrint("Permission after request = $_hasPermission");
+      _hasPermission =
+      await _repository.requestPermission();
+
+      debugPrint(
+        "Permission after request = "
+            "$_hasPermission",
+      );
 
       if (!_hasPermission) {
-        debugPrint("Permission denied");
+        debugPrint(
+          "Permission denied",
+        );
+
         _contacts = [];
+        _registeredUsers = [];
+
         return;
       }
 
-      _contacts = await _repository.getContacts();
+      _contacts =
+      await _repository.getContacts();
 
-      final phoneNumbers = _contacts.map((contact) {
-        String phone = contact.phones.first.number;
+      // ============================================================
+      // NORMALIZE DEVICE CONTACT NUMBERS
+      // ============================================================
 
-        phone = phone.replaceAll(RegExp(r'\s+'), '');
+      final phoneNumbers = _contacts
+          .where(
+            (contact) =>
+        contact.phones.isNotEmpty,
+      )
+          .map((contact) {
+        final phone =
+            contact.phones.first.number;
 
-        if (phone.startsWith('+91')) {
-          phone = phone.substring(3);
-        }
+        return normalizePhoneNumber(
+          phone,
+        );
+      })
+          .where(
+            (phone) => phone.isNotEmpty,
+      )
+          .toList();
 
-        if (phone.startsWith('91') && phone.length == 12) {
-          phone = phone.substring(2);
-        }
-
-        return phone;
-      }).toList();
-
-      debugPrint("========== ALL PHONE NUMBERS ==========");
+      debugPrint(
+        "========== ALL PHONE NUMBERS ==========",
+      );
 
       for (final number in phoneNumbers) {
         debugPrint(number);
       }
 
-      debugPrint("=======================================");
+      debugPrint(
+        "=======================================",
+      );
 
-      _registeredUsers = await _repository.getRegisteredContacts(
+      // ============================================================
+      // GET REGISTERED USERS
+      // ============================================================
+
+      _registeredUsers =
+      await _repository.getRegisteredContacts(
         phoneNumbers,
       );
 
-      debugPrint("========== REGISTERED USERS ==========");
+      // ============================================================
+      // REMOVE LOGGED-IN USER
+      // ============================================================
+
+      if (_currentUserPhoneNumber != null &&
+          _currentUserPhoneNumber!.isNotEmpty) {
+        _registeredUsers =
+            _registeredUsers.where((user) {
+              final userPhone =
+              normalizePhoneNumber(
+                user.phoneNumber,
+              );
+
+              return userPhone !=
+                  _currentUserPhoneNumber;
+            }).toList();
+      }
+
+      debugPrint(
+        "========== REGISTERED USERS ==========",
+      );
 
       for (final user in _registeredUsers) {
         debugPrint(
-          "${user.username} - ${user.phoneNumber}",
+          "${user.username} - "
+              "${user.phoneNumber}",
         );
       }
 
-      debugPrint("======================================");
+      debugPrint(
+        "======================================",
+      );
 
-      debugPrint("Contacts loaded = ${_contacts.length}");
+      debugPrint(
+        "Contacts loaded = "
+            "${_contacts.length}",
+      );
 
       _contacts.sort(
-            (a, b) => a.displayName.compareTo(b.displayName),
+            (a, b) =>
+            a.displayName.compareTo(
+              b.displayName,
+            ),
       );
     } finally {
       _isLoading = false;
@@ -103,18 +213,46 @@ class ContactsProvider extends ChangeNotifier {
     }
   }
 
-  void toggleSelection(String contactId) {
-    if (_selectedContacts.contains(contactId)) {
-      _selectedContacts.remove(contactId);
+  // ================================================================
+  // SELECTION
+  // ================================================================
+
+  void toggleSelection(
+      String contactId,
+      ) {
+    if (_selectedContacts.contains(
+      contactId,
+    )) {
+      _selectedContacts.remove(
+        contactId,
+      );
     } else {
-      _selectedContacts.add(contactId);
+      _selectedContacts.add(
+        contactId,
+      );
     }
 
     notifyListeners();
   }
 
-  void searchContacts(String query) {
+  void clearSelectedContacts() {
+    _selectedContacts.clear();
+    notifyListeners();
+  }
+
+  // ================================================================
+  // SEARCH
+  // ================================================================
+
+  void searchContacts(
+      String query,
+      ) {
     _searchQuery = query;
+    notifyListeners();
+  }
+
+  void clearSearch() {
+    _searchQuery = "";
     notifyListeners();
   }
 }

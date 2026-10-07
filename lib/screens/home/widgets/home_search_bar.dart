@@ -21,9 +21,9 @@ class HomeSearchBar extends StatelessWidget {
         horizontal: scaler.w(14),
       ),
       decoration: BoxDecoration(
-        // ============================================================
+        // =========================================================
         // GLASS BACKGROUND
-        // ============================================================
+        // =========================================================
 
         color: Colors.white.withValues(
           alpha: 0.055,
@@ -33,9 +33,9 @@ class HomeSearchBar extends StatelessWidget {
           scaler.h(30),
         ),
 
-        // ============================================================
+        // =========================================================
         // PURPLE GLASS BORDER
-        // ============================================================
+        // =========================================================
 
         border: Border.all(
           color: AppColors.primary.withValues(
@@ -46,9 +46,9 @@ class HomeSearchBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // ==========================================================
+          // =======================================================
           // SEARCH ICON
-          // ==========================================================
+          // =======================================================
 
           Icon(
             Icons.search_rounded,
@@ -60,21 +60,24 @@ class HomeSearchBar extends StatelessWidget {
             width: scaler.w(8),
           ),
 
-          // ==========================================================
+          // =======================================================
           // SEARCH FIELD
-          // ==========================================================
+          // =======================================================
 
           Expanded(
             child: TextField(
               cursorColor: AppColors.accent,
+
               onChanged: onChanged,
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: 'Raleway',
-                fontSize: scaler.sp(14),
-              ),
+
+              // Explicitly prevent the TextField itself from
+              // drawing another background.
               decoration: InputDecoration(
+                filled: false,
+                fillColor: Colors.transparent,
+
                 hintText: 'Search groups or people...',
+
                 hintStyle: TextStyle(
                   color: Colors.white.withValues(
                     alpha: 0.45,
@@ -82,11 +85,20 @@ class HomeSearchBar extends StatelessWidget {
                   fontFamily: 'Raleway',
                   fontSize: scaler.sp(14),
                 ),
+
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
+
                 isCollapsed: true,
                 contentPadding: EdgeInsets.zero,
+              ),
+
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: 'Raleway',
+                fontSize: scaler.sp(14),
+                backgroundColor: Colors.transparent,
               ),
             ),
           ),

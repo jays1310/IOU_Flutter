@@ -6,23 +6,27 @@ import '../../core/theme/app_colors.dart';
 import '../../core/utils/app_scaler.dart';
 
 import '../../models/registered_user_model.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/contacts_provider.dart';
 
 import '../../widgets/app_button.dart';
 
-class SelectIndividualScreen extends StatefulWidget {
+class SelectIndividualScreen
+    extends StatefulWidget {
   const SelectIndividualScreen({
     super.key,
   });
 
   @override
-  State<SelectIndividualScreen> createState() =>
+  State<SelectIndividualScreen>
+  createState() =>
       _SelectIndividualScreenState();
 }
 
 class _SelectIndividualScreenState
     extends State<SelectIndividualScreen> {
-  final TextEditingController _searchController =
+  final TextEditingController
+  _searchController =
   TextEditingController();
 
   RegisteredUserModel? _selectedUser;
@@ -31,8 +35,25 @@ class _SelectIndividualScreenState
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ContactsProvider>().loadContacts();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) {
+      final contactsProvider =
+      context.read<ContactsProvider>();
+
+      final authProvider =
+      context.read<AuthProvider>();
+
+      // Select Individual is a new
+      // selection session.
+      contactsProvider
+          .clearSelectedContacts();
+
+      contactsProvider.loadContacts(
+        currentUserPhoneNumber:
+        authProvider
+            .currentUser
+            ?.phoneNumber,
+      );
     });
   }
 
@@ -46,9 +67,12 @@ class _SelectIndividualScreenState
   // SELECT USER
   // ================================================================
 
-  void _selectUser(RegisteredUserModel user) {
+  void _selectUser(
+      RegisteredUserModel user,
+      ) {
     setState(() {
-      if (_selectedUser?.phoneNumber == user.phoneNumber) {
+      if (_selectedUser?.phoneNumber ==
+          user.phoneNumber) {
         _selectedUser = null;
       } else {
         _selectedUser = user;
@@ -72,28 +96,43 @@ class _SelectIndividualScreenState
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+      BuildContext context,
+      ) {
     final s = AppScaler(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor:
+      AppColors.background,
 
       // ================================================================
       // ADD BUTTON
       // ================================================================
 
       floatingActionButtonLocation:
-      FloatingActionButtonLocation.centerFloat,
+      FloatingActionButtonLocation
+          .centerFloat,
 
-      floatingActionButton: AnimatedSlide(
-        duration: const Duration(milliseconds: 300),
+      floatingActionButton:
+      AnimatedSlide(
+        duration:
+        const Duration(
+          milliseconds: 300,
+        ),
         curve: Curves.easeOut,
-        offset: _selectedUser != null
+        offset: _selectedUser !=
+            null
             ? Offset.zero
             : const Offset(0, 2),
         child: AnimatedOpacity(
-          duration: const Duration(milliseconds: 250),
-          opacity: _selectedUser != null ? 1 : 0,
+          duration:
+          const Duration(
+            milliseconds: 250,
+          ),
+          opacity:
+          _selectedUser != null
+              ? 1
+              : 0,
           child: Padding(
             padding: EdgeInsets.only(
               bottom: s.h(20),
@@ -102,12 +141,19 @@ class _SelectIndividualScreenState
               width: s.w(220),
               child: AppButton(
                 text: 'Add',
-                width: double.infinity,
+                width:
+                double.infinity,
                 height: s.h(52),
-                borderRadius: BorderRadius.circular(30),
+                borderRadius:
+                BorderRadius.circular(
+                  30,
+                ),
                 showShadow: false,
                 onPressed:
-                _selectedUser != null ? _submit : null,
+                _selectedUser !=
+                    null
+                    ? _submit
+                    : null,
               ),
             ),
           ),
@@ -119,8 +165,10 @@ class _SelectIndividualScreenState
       // ================================================================
 
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppColors.screenGradient,
+        decoration:
+        const BoxDecoration(
+          gradient:
+          AppColors.screenGradient,
         ),
         child: SafeArea(
           child: Stack(
@@ -135,14 +183,19 @@ class _SelectIndividualScreenState
                 child: Container(
                   width: s.w(280),
                   height: s.w(280),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
+                  decoration:
+                  BoxDecoration(
+                    shape:
+                    BoxShape.circle,
+                    gradient:
+                    RadialGradient(
                       colors: [
-                        AppColors.primary.withValues(
+                        AppColors.primary
+                            .withValues(
                           alpha: 0.16,
                         ),
-                        AppColors.primary.withValues(
+                        AppColors.primary
+                            .withValues(
                           alpha: 0.0,
                         ),
                       ],
@@ -161,14 +214,19 @@ class _SelectIndividualScreenState
                 child: Container(
                   width: s.w(300),
                   height: s.w(300),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
+                  decoration:
+                  BoxDecoration(
+                    shape:
+                    BoxShape.circle,
+                    gradient:
+                    RadialGradient(
                       colors: [
-                        AppColors.accent.withValues(
+                        AppColors.accent
+                            .withValues(
                           alpha: 0.12,
                         ),
-                        AppColors.accent.withValues(
+                        AppColors.accent
+                            .withValues(
                           alpha: 0.0,
                         ),
                       ],
@@ -191,7 +249,8 @@ class _SelectIndividualScreenState
                     width: s.w(411),
                     height: s.h(428),
                     child: Image.asset(
-                      AppAssets.moneyTransfer,
+                      AppAssets
+                          .moneyTransfer,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -209,18 +268,26 @@ class _SelectIndividualScreenState
                   // ========================================================
 
                   Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(
+                    width:
+                    double.infinity,
+                    padding:
+                    EdgeInsets.symmetric(
                       horizontal: s.w(12),
                       vertical: s.h(10),
                     ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(
+                    decoration:
+                    BoxDecoration(
+                      color: Colors.white
+                          .withValues(
                         alpha: 0.025,
                       ),
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.white.withValues(
+                      border:
+                      Border(
+                        bottom:
+                        BorderSide(
+                          color: Colors
+                              .white
+                              .withValues(
                             alpha: 0.06,
                           ),
                           width: 1,
@@ -228,26 +295,36 @@ class _SelectIndividualScreenState
                       ),
                     ),
                     child: Stack(
-                      alignment: Alignment.center,
+                      alignment:
+                      Alignment.center,
                       children: [
                         // ------------------------------------------------
                         // BACK ARROW
                         // ------------------------------------------------
 
                         Align(
-                          alignment: Alignment.centerLeft,
-                          child: GestureDetector(
+                          alignment:
+                          Alignment
+                              .centerLeft,
+                          child:
+                          GestureDetector(
                             onTap: () {
-                              Navigator.pop(context);
+                              Navigator.pop(
+                                context,
+                              );
                             },
                             child: Opacity(
                               opacity: 0.85,
                               child: SizedBox(
                                 width: s.w(50),
-                                height: s.h(48),
-                                child: Image.asset(
-                                  AppAssets.backArrow,
-                                  fit: BoxFit.contain,
+                                height:
+                                s.h(48),
+                                child:
+                                Image.asset(
+                                  AppAssets
+                                      .backArrow,
+                                  fit: BoxFit
+                                      .contain,
                                 ),
                               ),
                             ),
@@ -260,11 +337,17 @@ class _SelectIndividualScreenState
 
                         Text(
                           'Select Individual',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Raleway',
-                            fontSize: s.sp(20),
-                            fontWeight: FontWeight.w600,
+                          style:
+                          TextStyle(
+                            color:
+                            Colors.white,
+                            fontFamily:
+                            'Raleway',
+                            fontSize:
+                            s.sp(20),
+                            fontWeight:
+                            FontWeight
+                                .w600,
                           ),
                         ),
                       ],
@@ -276,73 +359,116 @@ class _SelectIndividualScreenState
                   // ========================================================
 
                   Expanded(
-                    child: Consumer<ContactsProvider>(
+                    child:
+                    Consumer<
+                        ContactsProvider>(
                       builder: (
                           context,
                           provider,
                           child,
                           ) {
-                        if (provider.isLoading) {
+                        // ------------------------------------------------
+                        // LOADING
+                        // ------------------------------------------------
+
+                        if (provider
+                            .isLoading) {
                           return Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.accent,
+                            child:
+                            CircularProgressIndicator(
+                              color:
+                              AppColors
+                                  .accent,
                               strokeWidth: 2.5,
                             ),
                           );
                         }
 
-                        if (!provider.hasPermission) {
+                        // ------------------------------------------------
+                        // PERMISSION
+                        // ------------------------------------------------
+
+                        if (!provider
+                            .hasPermission) {
                           return Center(
                             child: Text(
                               'Contacts permission denied',
-                              style: TextStyle(
-                                color: Colors.white.withValues(
+                              style:
+                              TextStyle(
+                                color: Colors
+                                    .white
+                                    .withValues(
                                   alpha: 0.70,
                                 ),
-                                fontFamily: 'Raleway',
-                                fontSize: s.sp(15),
+                                fontFamily:
+                                'Raleway',
+                                fontSize:
+                                s.sp(15),
                               ),
                             ),
                           );
                         }
 
-                        if (provider.contacts.isEmpty) {
+                        // ------------------------------------------------
+                        // NO CONTACTS
+                        // ------------------------------------------------
+
+                        if (provider
+                            .contacts
+                            .isEmpty) {
                           return Center(
                             child: Text(
                               'No contacts found',
-                              style: TextStyle(
-                                color: Colors.white.withValues(
+                              style:
+                              TextStyle(
+                                color: Colors
+                                    .white
+                                    .withValues(
                                   alpha: 0.70,
                                 ),
-                                fontFamily: 'Raleway',
-                                fontSize: s.sp(15),
+                                fontFamily:
+                                'Raleway',
+                                fontSize:
+                                s.sp(15),
                               ),
                             ),
                           );
                         }
 
                         // ------------------------------------------------
-                        // SEARCH ONLY REGISTERED USERS
+                        // SEARCH
                         // ------------------------------------------------
 
-                        final query = _searchController.text
+                        final query =
+                        _searchController
+                            .text
                             .trim()
                             .toLowerCase();
 
                         final availableUsers =
-                        provider.registeredUsers
-                            .where((user) {
-                          if (query.isEmpty) {
-                            return true;
-                          }
+                        provider
+                            .registeredUsers
+                            .where(
+                              (user) {
+                            if (query
+                                .isEmpty) {
+                              return true;
+                            }
 
-                          return user.username
-                              .toLowerCase()
-                              .contains(query) ||
-                              user.phoneNumber
-                                  .toLowerCase()
-                                  .contains(query);
-                        }).toList();
+                            return user
+                                .username
+                                .toLowerCase()
+                                .contains(
+                              query,
+                            ) ||
+                                user
+                                    .phoneNumber
+                                    .toLowerCase()
+                                    .contains(
+                                  query,
+                                );
+                          },
+                        ).toList();
 
                         return Column(
                           children: [
@@ -351,69 +477,115 @@ class _SelectIndividualScreenState
                             // ============================================
 
                             Padding(
-                              padding: EdgeInsets.fromLTRB(
+                              padding:
+                              EdgeInsets
+                                  .fromLTRB(
                                 s.w(16),
                                 s.h(16),
                                 s.w(16),
                                 s.h(12),
                               ),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(
-                                    alpha: 0.055,
+                              child:
+                              Container(
+                                decoration:
+                                BoxDecoration(
+                                  color: Colors
+                                      .white
+                                      .withValues(
+                                    alpha:
+                                    0.055,
                                   ),
                                   borderRadius:
-                                  BorderRadius.circular(
+                                  BorderRadius
+                                      .circular(
                                     s.w(14),
                                   ),
-                                  border: Border.all(
-                                    color: AppColors.primary
+                                  border:
+                                  Border.all(
+                                    color: AppColors
+                                        .primary
                                         .withValues(
-                                      alpha: 0.22,
+                                      alpha:
+                                      0.22,
                                     ),
                                   ),
                                 ),
-                                child: TextField(
+                                child:
+                                TextField(
                                   controller:
                                   _searchController,
-                                  onChanged: (_) {
-                                    setState(() {});
+                                  onChanged:
+                                      (_) {
+                                    setState(
+                                          () {},
+                                    );
                                   },
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'Raleway',
-                                    fontSize: s.sp(14),
+                                  style:
+                                  TextStyle(
+                                    color:
+                                    Colors
+                                        .white,
+                                    fontFamily:
+                                    'Raleway',
+                                    fontSize:
+                                    s.sp(
+                                      14,
+                                    ),
                                   ),
                                   cursorColor:
-                                  AppColors.accent,
+                                  AppColors
+                                      .accent,
                                   decoration:
                                   InputDecoration(
                                     hintText:
                                     'Search contacts...',
-                                    hintStyle: TextStyle(
-                                      color: Colors.white
+                                    hintStyle:
+                                    TextStyle(
+                                      color: Colors
+                                          .white
                                           .withValues(
-                                        alpha: 0.45,
+                                        alpha:
+                                        0.45,
                                       ),
-                                      fontFamily: 'Raleway',
-                                      fontSize: s.sp(14),
+                                      fontFamily:
+                                      'Raleway',
+                                      fontSize:
+                                      s.sp(
+                                        14,
+                                      ),
                                     ),
-                                    prefixIcon: Icon(
-                                      Icons.search_rounded,
+                                    prefixIcon:
+                                    Icon(
+                                      Icons
+                                          .search_rounded,
                                       color:
-                                      AppColors.accent,
-                                      size: s.sp(22),
+                                      AppColors
+                                          .accent,
+                                      size:
+                                      s.sp(
+                                        22,
+                                      ),
                                     ),
                                     border:
-                                    InputBorder.none,
+                                    InputBorder
+                                        .none,
                                     enabledBorder:
-                                    InputBorder.none,
+                                    InputBorder
+                                        .none,
                                     focusedBorder:
-                                    InputBorder.none,
+                                    InputBorder
+                                        .none,
                                     contentPadding:
-                                    EdgeInsets.symmetric(
-                                      horizontal: s.w(4),
-                                      vertical: s.h(15),
+                                    EdgeInsets
+                                        .symmetric(
+                                      horizontal:
+                                      s.w(
+                                        4,
+                                      ),
+                                      vertical:
+                                      s.h(
+                                        15,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -425,33 +597,57 @@ class _SelectIndividualScreenState
                             // ============================================
 
                             Expanded(
-                              child: availableUsers.isEmpty
+                              child:
+                              availableUsers
+                                  .isEmpty
                                   ? Center(
-                                child: Text(
+                                child:
+                                Text(
                                   'No registered contacts found',
-                                  style: TextStyle(
-                                    color: Colors.white
+                                  style:
+                                  TextStyle(
+                                    color: Colors
+                                        .white
                                         .withValues(
-                                      alpha: 0.65,
+                                      alpha:
+                                      0.65,
                                     ),
-                                    fontFamily: 'Raleway',
-                                    fontSize: s.sp(15),
+                                    fontFamily:
+                                    'Raleway',
+                                    fontSize:
+                                    s.sp(
+                                      15,
+                                    ),
                                   ),
                                 ),
                               )
-                                  : ListView.builder(
+                                  : ListView
+                                  .builder(
                                 physics:
                                 const BouncingScrollPhysics(),
                                 padding:
                                 EdgeInsets.only(
-                                  left: s.w(16),
-                                  right: s.w(16),
-                                  bottom: s.h(100),
+                                  left:
+                                  s.w(
+                                    16,
+                                  ),
+                                  right:
+                                  s.w(
+                                    16,
+                                  ),
+                                  bottom:
+                                  s.h(
+                                    100,
+                                  ),
                                 ),
                                 itemCount:
-                                availableUsers.length,
+                                availableUsers
+                                    .length,
                                 itemBuilder:
-                                    (context, index) {
+                                    (
+                                    context,
+                                    index,
+                                    ) {
                                   final user =
                                   availableUsers[
                                   index];
@@ -464,17 +660,24 @@ class _SelectIndividualScreenState
                                   return Padding(
                                     padding:
                                     EdgeInsets.only(
-                                      bottom: s.h(10),
+                                      bottom:
+                                      s.h(
+                                        10,
+                                      ),
                                     ),
                                     child:
                                     _ContactTile(
-                                      user: user,
+                                      user:
+                                      user,
                                       isSelected:
                                       isSelected,
-                                      scaler: s,
-                                      onTap: () {
+                                      scaler:
+                                      s,
+                                      onTap:
+                                          () {
                                         _selectUser(
-                                            user);
+                                          user,
+                                        );
                                       },
                                     ),
                                   );
@@ -500,7 +703,8 @@ class _SelectIndividualScreenState
 // CONTACT TILE
 // ===========================================================================
 
-class _ContactTile extends StatelessWidget {
+class _ContactTile
+    extends StatelessWidget {
   final RegisteredUserModel user;
   final bool isSelected;
   final AppScaler scaler;
@@ -514,16 +718,23 @@ class _ContactTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final username = user.username.trim();
+  Widget build(
+      BuildContext context,
+      ) {
+    final username =
+    user.username.trim();
 
-    final initials = username.isNotEmpty
+    final initials =
+    username.isNotEmpty
         ? username
         .split(' ')
-        .where((e) => e.isNotEmpty)
+        .where(
+          (e) => e.isNotEmpty,
+    )
         .take(2)
         .map(
-          (e) => e[0].toUpperCase(),
+          (e) =>
+          e[0].toUpperCase(),
     )
         .join()
         : '?';
@@ -531,37 +742,50 @@ class _ContactTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
+        duration:
+        const Duration(
+          milliseconds: 180,
+        ),
         width: double.infinity,
-        padding: EdgeInsets.symmetric(
+        padding:
+        EdgeInsets.symmetric(
           horizontal: scaler.w(14),
           vertical: scaler.h(11),
         ),
-        decoration: BoxDecoration(
+        decoration:
+        BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withValues(
+              ? AppColors.primary
+              .withValues(
             alpha: 0.16,
           )
-              : AppColors.background.withValues(
+              : AppColors.background
+              .withValues(
             alpha: 0.72,
           ),
-          borderRadius: BorderRadius.circular(
+          borderRadius:
+          BorderRadius.circular(
             scaler.w(16),
           ),
           border: Border.all(
             color: isSelected
-                ? AppColors.accent.withValues(
+                ? AppColors.accent
+                .withValues(
               alpha: 0.65,
             )
-                : AppColors.primary.withValues(
+                : AppColors.primary
+                .withValues(
               alpha: 0.20,
             ),
-            width: isSelected ? 1.2 : 1,
+            width:
+            isSelected ? 1.2 : 1,
           ),
           boxShadow: isSelected
               ? [
             BoxShadow(
-              color: AppColors.primary.withValues(
+              color: AppColors
+                  .primary
+                  .withValues(
                 alpha: 0.16,
               ),
               blurRadius: 14,
@@ -579,11 +803,15 @@ class _ContactTile extends StatelessWidget {
             Container(
               width: scaler.w(46),
               height: scaler.w(46),
-              decoration: BoxDecoration(
+              decoration:
+              const BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                gradient:
+                LinearGradient(
+                  begin:
+                  Alignment.topLeft,
+                  end: Alignment
+                      .bottomRight,
                   colors: [
                     AppColors.accent,
                     AppColors.primary,
@@ -591,26 +819,32 @@ class _ContactTile extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withValues(
-                      alpha: 0.18,
-                    ),
+                    color:
+                    AppColors.primary,
                     blurRadius: 10,
                   ),
                 ],
               ),
-              alignment: Alignment.center,
+              alignment:
+              Alignment.center,
               child: Text(
                 initials,
                 style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'Raleway',
-                  fontSize: scaler.sp(16),
-                  fontWeight: FontWeight.w700,
+                  color:
+                  Colors.white,
+                  fontFamily:
+                  'Raleway',
+                  fontSize:
+                  scaler.sp(16),
+                  fontWeight:
+                  FontWeight.w700,
                 ),
               ),
             ),
 
-            SizedBox(width: scaler.w(14)),
+            SizedBox(
+              width: scaler.w(14),
+            ),
 
             // =============================================================
             // USER DETAILS
@@ -619,57 +853,81 @@ class _ContactTile extends StatelessWidget {
             Expanded(
               child: Column(
                 crossAxisAlignment:
-                CrossAxisAlignment.start,
+                CrossAxisAlignment
+                    .start,
                 children: [
                   Text(
                     user.username,
                     maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    overflow:
+                    TextOverflow
+                        .ellipsis,
                     style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Raleway',
-                      fontSize: scaler.sp(15),
-                      fontWeight: FontWeight.w600,
+                      color:
+                      Colors.white,
+                      fontFamily:
+                      'Raleway',
+                      fontSize:
+                      scaler.sp(15),
+                      fontWeight:
+                      FontWeight.w600,
                     ),
                   ),
-
-                  SizedBox(height: scaler.h(4)),
-
+                  SizedBox(
+                    height:
+                    scaler.h(4),
+                  ),
                   Text(
                     user.phoneNumber,
                     maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    overflow:
+                    TextOverflow
+                        .ellipsis,
                     style: TextStyle(
-                      color: Colors.white.withValues(
+                      color: Colors
+                          .white
+                          .withValues(
                         alpha: 0.55,
                       ),
-                      fontFamily: 'Raleway',
-                      fontSize: scaler.sp(13),
+                      fontFamily:
+                      'Raleway',
+                      fontSize:
+                      scaler.sp(13),
                     ),
                   ),
                 ],
               ),
             ),
 
-            SizedBox(width: scaler.w(10)),
+            SizedBox(
+              width: scaler.w(10),
+            ),
 
             // =============================================================
             // CHECKBOX
             // =============================================================
 
             AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
+              duration:
+              const Duration(
+                milliseconds: 180,
+              ),
               width: scaler.w(24),
               height: scaler.w(24),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
+              decoration:
+              BoxDecoration(
+                shape:
+                BoxShape.circle,
                 color: isSelected
                     ? AppColors.primary
                     : Colors.transparent,
-                border: Border.all(
+                border:
+                Border.all(
                   color: isSelected
-                      ? AppColors.accent
-                      : Colors.white.withValues(
+                      ? AppColors
+                      .accent
+                      : Colors.white
+                      .withValues(
                     alpha: 0.30,
                   ),
                   width: 1.5,
@@ -677,9 +935,12 @@ class _ContactTile extends StatelessWidget {
               ),
               child: isSelected
                   ? Icon(
-                Icons.check_rounded,
-                color: Colors.white,
-                size: scaler.sp(16),
+                Icons
+                    .check_rounded,
+                color:
+                Colors.white,
+                size:
+                scaler.sp(16),
               )
                   : null,
             ),

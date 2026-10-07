@@ -4,10 +4,12 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../providers/group_provider.dart';
 import '../../../providers/transaction_provider.dart';
+
 import '../../group/group_screen.dart';
 import 'empty_groups.dart';
 import 'group_card.dart';
 import 'individual_card.dart';
+
 import '../../individual/individual_screen.dart';
 import '../../../models/registered_user_model.dart';
 
@@ -27,9 +29,9 @@ class HomeGroupList extends StatelessWidget {
     final transactionProvider =
     context.watch<TransactionProvider>();
 
-    // ---------------------------------------------------------
-    // Loading
-    // ---------------------------------------------------------
+    // =========================================================
+    // LOADING
+    // =========================================================
 
     if (groupProvider.isLoading) {
       return Center(
@@ -44,15 +46,15 @@ class HomeGroupList extends StatelessWidget {
     final individuals =
         transactionProvider.individualRelationships;
 
-    // ---------------------------------------------------------
-    // Search query
-    // ---------------------------------------------------------
+    // =========================================================
+    // SEARCH QUERY
+    // =========================================================
 
     final query = searchQuery.trim().toLowerCase();
 
-    // ---------------------------------------------------------
-    // Filter groups
-    // ---------------------------------------------------------
+    // =========================================================
+    // FILTER GROUPS
+    // =========================================================
 
     final filteredGroups = query.isEmpty
         ? groups
@@ -62,9 +64,9 @@ class HomeGroupList extends StatelessWidget {
           .contains(query);
     }).toList();
 
-    // ---------------------------------------------------------
-    // Filter individuals
-    // ---------------------------------------------------------
+    // =========================================================
+    // FILTER INDIVIDUALS
+    // =========================================================
 
     final filteredIndividuals = query.isEmpty
         ? individuals
@@ -78,67 +80,89 @@ class HomeGroupList extends StatelessWidget {
       return username.contains(query);
     }).toList();
 
-    // ---------------------------------------------------------
-    // Empty state
-    // ---------------------------------------------------------
+    // =========================================================
+    // EMPTY STATE
+    // =========================================================
 
     if (filteredGroups.isEmpty &&
         filteredIndividuals.isEmpty) {
-      if (query.isNotEmpty) {
-        return RefreshIndicator(
-          color: AppColors.accent,
-          backgroundColor: AppColors.card,
-          onRefresh: onRefresh ?? () async {},
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
-            ),
-            children: [
-              SizedBox(
-                height:
-                MediaQuery.sizeOf(context).height * 0.35,
-                child: Center(
-                  child: Text(
-                    'No results found',
-                    style: TextStyle(
-                      color: Colors.white.withValues(
-                        alpha: 0.45,
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          // -----------------------------------------------------
+          // SEARCH HAS NO RESULTS
+          // -----------------------------------------------------
+
+          if (query.isNotEmpty) {
+            return RefreshIndicator(
+              color: AppColors.accent,
+              backgroundColor: AppColors.card,
+              onRefresh: onRefresh ?? () async {},
+              child: ListView(
+                physics:
+                const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                padding: EdgeInsets.zero,
+                children: [
+                  SizedBox(
+                    height: constraints.maxHeight,
+                    child: Center(
+                      child: Text(
+                        'No results found',
+                        style: TextStyle(
+                          color: Colors.white.withValues(
+                            alpha: 0.45,
+                          ),
+                          fontFamily: 'Raleway',
+                          fontSize: 14,
+                        ),
                       ),
-                      fontFamily: 'Raleway',
-                      fontSize: 14,
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
-        );
-      }
+            );
+          }
 
-      return RefreshIndicator(
-        color: AppColors.accent,
-        backgroundColor: AppColors.card,
-        onRefresh: onRefresh ?? () async {},
-        child: ListView(
-          physics: const AlwaysScrollableScrollPhysics(
-            parent: BouncingScrollPhysics(),
-          ),
-          children: const [
-            EmptyGroups(),
-          ],
-        ),
+          // -----------------------------------------------------
+          // NO GROUPS / NO INDIVIDUALS
+          // -----------------------------------------------------
+
+          return RefreshIndicator(
+            color: AppColors.accent,
+            backgroundColor: AppColors.card,
+            strokeWidth: 2.5,
+            displacement: 20,
+            onRefresh: onRefresh ?? () async {},
+            child: ListView(
+              physics:
+              const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
+              ),
+              padding: EdgeInsets.zero,
+              children: [
+                SizedBox(
+                  height: constraints.maxHeight,
+                  child: const Center(
+                    child: EmptyGroups(),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       );
     }
 
-    // ---------------------------------------------------------
-    // Build unified activity list
-    // ---------------------------------------------------------
+    // =========================================================
+    // BUILD UNIFIED ACTIVITY LIST
+    // =========================================================
 
     final List<_HomeActivityItem> activities = [];
 
-    // ---------------------------------------------------------
-    // Groups
-    // ---------------------------------------------------------
+    // =========================================================
+    // GROUPS
+    // =========================================================
 
     for (final group in filteredGroups) {
       activities.add(
@@ -174,9 +198,9 @@ class HomeGroupList extends StatelessWidget {
       );
     }
 
-    // ---------------------------------------------------------
-    // Individuals
-    // ---------------------------------------------------------
+    // =========================================================
+    // INDIVIDUALS
+    // =========================================================
 
     for (final relationship in filteredIndividuals) {
       final user = RegisteredUserModel(
@@ -238,9 +262,9 @@ class HomeGroupList extends StatelessWidget {
       );
     }
 
-    // ---------------------------------------------------------
-    // Sort newest activity first
-    // ---------------------------------------------------------
+    // =========================================================
+    // SORT NEWEST ACTIVITY FIRST
+    // =========================================================
 
     activities.sort(
           (a, b) => b.lastActivity.compareTo(
@@ -248,9 +272,9 @@ class HomeGroupList extends StatelessWidget {
       ),
     );
 
-    // ---------------------------------------------------------
-    // Display
-    // ---------------------------------------------------------
+    // =========================================================
+    // DISPLAY
+    // =========================================================
 
     return RefreshIndicator(
       color: AppColors.accent,
